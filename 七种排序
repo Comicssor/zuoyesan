@@ -1,0 +1,265 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
+// 直接插入排序
+void insertionSort(int arr[], int n) {
+	int i, key, j;
+	for (i = 1; i < n; i++) {
+		key = arr[i];
+		j = i - 1;
+
+		while (j >= 0 && arr[j] > key) {
+			arr[j + 1] = arr[j];
+			j = j - 1;
+		}
+		arr[j + 1] = key;
+	}
+}
+
+// 希尔排序
+void shellSort(int arr[], int n) {
+	int gap, i, j, temp;
+	for (gap = n / 2; gap > 0; gap /= 2) {
+		for (i = gap; i < n; i++) {
+			temp = arr[i];
+			for (j = i; j >= gap && arr[j - gap] > temp; j -= gap) {
+				arr[j] = arr[j - gap];
+			}
+			arr[j] = temp;
+		}
+	}
+}
+
+// 选择排序
+void selectionSort(int arr[], int n) {
+	int i, j, min_idx, temp;
+	for (i = 0; i < n - 1; i++) {
+		min_idx = i;
+		for (j = i + 1; j < n; j++) {
+			if (arr[j] < arr[min_idx]) {
+				min_idx = j;
+			}
+		}
+		temp = arr[min_idx];
+		arr[min_idx] = arr[i];
+		arr[i] = temp;
+	}
+}
+
+// 堆排序
+void heapify(int arr[], int n, int i) {
+	int largest = i;
+	int left = 2 * i + 1;
+	int right = 2 * i + 2;
+	int temp;
+
+	if (left < n && arr[left] > arr[largest]) {
+		largest = left;
+	}
+
+	if (right < n && arr[right] > arr[largest]) {
+		largest = right;
+	}
+
+	if (largest != i) {
+		temp = arr[i];
+		arr[i] = arr[largest];
+		arr[largest] = temp;
+		heapify(arr, n, largest);
+	}
+}
+
+void heapSort(int arr[], int n) {
+	int i, temp;
+	for (i = n / 2 - 1; i >= 0; i--) {
+		heapify(arr, n, i);
+	}
+
+	for (i = n - 1; i >= 0; i--) {
+		temp = arr[0];
+		arr[0] = arr[i];
+		arr[i] = temp;
+		heapify(arr, i, 0);
+	}
+}
+
+// 冒泡排序
+void bubbleSort(int arr[], int n) {
+	int i, j, temp;
+	for (i = 0; i < n - 1; i++) {
+		for (j = 0; j < n - i - 1; j++) {
+			if (arr[j] > arr[j + 1]) {
+				temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+			}
+		}
+	}
+}
+
+// 快速排序
+int partition(int arr[], int low, int high) {
+	int pivot = arr[high];
+	int i = (low - 1);
+	int j, temp;
+
+	for (j = low; j <= high - 1; j++) {
+		if (arr[j] <= pivot) {
+			i++;
+			temp = arr[i];
+			arr[i] = arr[j];
+			arr[j] = temp;
+		}
+	}
+
+	temp = arr[i + 1];
+	arr[i + 1] = arr[high];
+	arr[high] = temp;
+
+	return (i + 1);
+}
+
+void quickSort(int arr[], int low, int high) {
+	if (low < high) {
+		int pi = partition(arr, low, high);
+		quickSort(arr, low, pi - 1);
+		quickSort(arr, pi + 1, high);
+	}
+}
+
+// 归并排序
+void merge(int arr[], int l, int m, int r) {
+	int i, j, k;
+	int n1 = m - l + 1;
+	int n2 = r - m;
+
+	int L[n1], R[n2];
+
+	for (i = 0; i < n1; i++) {
+		L[i] = arr[l + i];
+	}
+	for (j = 0; j < n2; j++) {
+		R[j] = arr[m + 1 + j];
+	}
+
+	i = 0;
+	j = 0;
+	k = l;
+
+	while (i < n1 && j < n2) {
+		if (L[i] <= R[j]) {
+			arr[k] = L[i];
+			i++;
+		} else {
+			arr[k] = R[j];
+			j++;
+		}
+		k++;
+	}
+
+	while (i < n1) {
+		arr[k] = L[i];
+		i++;
+		k++;
+	}
+
+	while (j < n2) {
+		arr[k] = R[j];
+		j++;
+		k++;
+	}
+}
+
+void mergeSort(int arr[], int l, int r) {
+	if (l < r) {
+		int m = l + (r - l) / 2;
+
+		mergeSort(arr, l, m);
+		mergeSort(arr, m + 1, r);
+
+		merge(arr, l, m, r);
+	}
+}
+
+
+
+
+
+int main() {
+	int n = 300000;  // 需要生成的随机数据数量
+	int arr[n];
+	int brr[n];
+	int i;
+	printf("生成%d个随机数据\n", n);
+	// 生成n个随机数
+	srand(time(NULL));
+	for (i = 0; i < n; i++) {
+		arr[i] = rand() % 10000;
+		brr[i] = arr[i];
+	}
+
+	clock_t start, end;
+	double cpu_time_used;
+
+
+	memcpy(arr, brr, sizeof(brr));
+	// 直接插入排序
+	start = clock();
+	insertionSort(arr, n);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("直接插入排序所需时间: %f 秒\n", cpu_time_used);
+
+	memcpy(arr, brr, sizeof(brr));
+	// 希尔排序
+	start = clock();
+	shellSort(arr, n);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("希尔排序所需时间: %f 秒\n", cpu_time_used);
+
+	memcpy(arr, brr, sizeof(brr));
+	// 选择排序
+	start = clock();
+	selectionSort(arr, n);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("选择排序所需时间: %f 秒\n", cpu_time_used);
+
+	memcpy(arr, brr, sizeof(brr));
+	// 堆排序
+	start = clock();
+	heapSort(arr, n);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("堆排序所需时间: %f 秒\n", cpu_time_used);
+
+	memcpy(arr, brr, sizeof(brr));
+	// 冒泡排序
+	start = clock();
+	bubbleSort(arr, n);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("冒泡排序所需时间: %f 秒\n", cpu_time_used);
+
+	memcpy(arr, brr, sizeof(brr));
+	// 快速排序
+	start = clock();
+	quickSort(arr, 0, n - 1);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("快速排序所需时间: %f 秒\n", cpu_time_used);
+
+	memcpy(arr, brr, sizeof(brr));
+	// 归并排序
+	start = clock();
+	mergeSort(arr, 0, n - 1);
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("归并排序所需时间: %f 秒\n", cpu_time_used);
+
+	return 0;
+}
+
